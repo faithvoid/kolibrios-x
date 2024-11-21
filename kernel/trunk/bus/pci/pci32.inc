@@ -152,10 +152,17 @@ pci_make_config_cmd:
 
 align 4
 
-pci_read_reg:
-        push    ebx esi
-        cmp     [BOOT.pci_data.access_mechanism], 2; what mechanism will we use?
-        je      .pci_read_reg_2
+ pci_read_reg:
+         push    ebx esi
+ 
+         cmp     ah, 1                           ; Bypass bug in XBOX HW
+         je      .pci_read_reg_err
+ 
+         cmp     ah, 2                           ; Bypass bug in XBOX HW
+         je      .pci_read_reg_err
+ 
+         cmp     byte [BOOT_VARS+0x9020], 2;what mechanism will we use?
+         je      pci_read_reg_2
 
                 ; mechanism 1
         mov     esi, eax ; save register size into ESI
